@@ -3,7 +3,7 @@ AddCSLuaFile()
 ENT.Type = "anim"
 ENT.Base = "base_anim"
 
-ENT.Category = "VR Weapons"
+ENT.Category = "Virtual Weapons"
 ENT.Spawnable = true
 ENT.VRWeapon = true
 

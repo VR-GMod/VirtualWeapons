@@ -1,6 +1,6 @@
 SWEP.PrintName = "Empty Hands"
 SWEP.Spawnable = true
-SWEP.Category = "VR Weapons"
+SWEP.Category = "Virtual Weapons"
 
 SWEP.Slot = 0
 SWEP.SlotPos = 0
