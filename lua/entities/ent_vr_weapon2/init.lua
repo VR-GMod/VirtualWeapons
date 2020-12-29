@@ -1,25 +1,13 @@
-AddCSLuaFile()
+AddCSLuaFile( "cl_init.lua" )
+AddCSLuaFile( "shared.lua" )
 
-ENT.Type = "anim"
-ENT.Base = "base_gmodentity"
-
-ENT.Category = "Virtual Weapons"
-ENT.Spawnable = true
-ENT.VRWeapon = true
-
-ENT.Model = "models/weapons/w_pistol.mdl"
-
-function ENT:SetupDataTables()
-    self:NetworkVar( "String", 0, "Hand" )
-    self:NetworkVar( "Entity", 0, "Carrier" )
-end
+include( "shared.lua" )
 
 function ENT:Initialize()
     self:SetModel( self.Model )
-
-    self:PhysicsInit( SOLID_VPHYSICS )
-    self:SetMoveType( MOVETYPE_VPHYSICS )
-    self:SetSolid( SOLID_VPHYSICS )
+	self:PhysicsInit( SOLID_VPHYSICS )
+	self:SetMoveType( MOVETYPE_VPHYSICS )
+	self:SetSolid( SOLID_VPHYSICS )
 
     self:SetCollisionGroup( COLLISION_GROUP_WEAPON )
 
@@ -27,6 +15,27 @@ function ENT:Initialize()
     if IsValid( phys ) then
         phys:Wake()
     end
+end
+
+function ENT:Think()
+    local ply = self:GetCarrier()
+
+    if not IsValid( ply ) then return end
+    if not ply:IsPlayer() then return end
+    if self:GetHand() == "" then return end
+
+    local pos, ang
+    if self:GetHand() == "left" then
+        pos, ang = vrmod.GetLeftHandPose( ply ) 
+    else
+        pos, ang = vrmod.GetRightHandPose( ply )
+    end
+
+    self:SetPos( pos )
+    self:SetAngles( ang )
+
+    self:NextThink( CurTime() )
+    return true
 end
 
 function ENT:PickUp( ply, left_hand )
@@ -48,7 +57,7 @@ function ENT:PickUp( ply, left_hand )
     --self:SetPos( pos )
     --self:SetAngles( ang )
 
-    self:FollowBone( ply, ply:LookupBone( left_hand and "ValveBiped.Bip01_L_Hand" or "ValveBiped.Bip01_R_Hand" ) )
+    --self:FollowBone( ply, ply:LookupBone( left_hand and "ValveBiped.Bip01_L_Hand" or "ValveBiped.Bip01_R_Hand" ) )
 end
 
 function ENT:OnPickedUp( left_hand )
@@ -75,14 +84,8 @@ function ENT:Shoot()
         Force = 1, -- Same
         Num = 1,
         TracerName = "Tracer",
-        Dir = self:GetForward(),
+        Dir = - self:GetForward(),
         Src = self:GetPos()
     } )
     self:EmitSound( "garrysmod/save_load" .. math.random( 1, 4 ) .. ".wav" )
-end
-
-function ENT:Draw()
-    self:DrawModel()
-
-    render.DrawLine( self:GetPos(), self:GetPos() * self:GetForward() * 10, Color( 255, 0, 0 ), true )
 end
