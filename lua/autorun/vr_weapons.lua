@@ -98,20 +98,4 @@ else
             end
         end
     end )
-
-    -- Left hand bone fix, because the vrmod developer forgot to add a line....
-    local callbackBone
-    hook.Add("VRMod_Start", "VRWeapons:BoneFix", function(ply)
-        callbackBone = ply:AddCallback("BuildBonePositions", function( ply, numbones )
-            local steamid = ply:SteamID()
-            if not g_VR.net[steamid].lerpedFrame or (ply:InVehicle() and ply:GetVehicle():GetClass() ~= "prop_vehicle_prisoner_pod") then return end
-            -- Already set in VRmod:
-            -- ply:SetBonePosition(characterInfo[steamid].bones.b_rightHand, g_VR.net[steamid].lerpedFrame.righthandPos, g_VR.net[steamid].lerpedFrame.righthandAng + Angle(0,0,180))
-            ply:SetBonePosition(ply:LookupBone("ValveBiped.Bip01_L_Hand") or -1, g_VR.net[steamid].lerpedFrame.lefthandPos, g_VR.net[steamid].lerpedFrame.lefthandAng + Angle(0,0,180))
-        end)
-    end)
-
-    hook.Add("VRMod_Exit", "VRWeapons:BoneFix", function(ply)
-        if callbackBone then ply:RemoveCallback("BuildBonePositions", callbackBone) end
-    end)
 end
