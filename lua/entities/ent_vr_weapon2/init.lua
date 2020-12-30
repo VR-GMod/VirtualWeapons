@@ -17,27 +17,6 @@ function ENT:Initialize()
     end
 end
 
-function ENT:Think()
-    local ply = self:GetCarrier()
-
-    if not IsValid( ply ) then return end
-    if not ply:IsPlayer() then return end
-    if self:GetHand() == "" then return end
-
-    local pos, ang
-    if self:GetHand() == "left" then
-        pos, ang = vrmod.GetLeftHandPose( ply ) 
-    else
-        pos, ang = vrmod.GetRightHandPose( ply )
-    end
-
-    self:SetPos( pos )
-    self:SetAngles( ang )
-
-    self:NextThink( CurTime() )
-    return true
-end
-
 function ENT:PickUp( ply, left_hand )
     if not IsValid( ply ) then return false end
     if not ply:IsPlayer() then return false end
@@ -47,17 +26,9 @@ function ENT:PickUp( ply, left_hand )
     self:SetCarrier( ply )
     ply:SetNWEntity( "vr_weapon_" .. self:GetHand(), self )
 
-    local pos, ang
-    if left_hand then
-        pos, ang = vrmod.GetLeftHandPose( ply ) 
-    else
-        pos, ang = vrmod.GetRightHandPose( ply )
-    end
-
-    --self:SetPos( pos )
-    --self:SetAngles( ang )
-
-    --self:FollowBone( ply, ply:LookupBone( left_hand and "ValveBiped.Bip01_L_Hand" or "ValveBiped.Bip01_R_Hand" ) )
+    local targetBone = ply:LookupBone( left_hand and "ValveBiped.Bip01_L_Hand" or "ValveBiped.Bip01_R_Hand" )
+    self:SetPos( ply:GetBonePosition(targetBone) )
+    self:FollowBone( ply, targetBone )
 end
 
 function ENT:OnPickedUp( left_hand )
